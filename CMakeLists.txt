@@ -8,6 +8,6 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Gui)
 
-add_executable(2write main.cpp editor.cpp)
+add_executable(2write main.cpp main_window.cpp text_edit.cpp)
 
 target_link_libraries(2write PRIVATE Qt6::Widgets Qt6::Gui)

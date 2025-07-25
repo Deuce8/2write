@@ -1,10 +1,8 @@
-#include "editor.h"
+#include "text_edit.h"
 
 #include <QFile>
 #include <QMimeData>
 #include <QPalette>
-#include <QShortcut>
-#include <QKeySequence>
 #include <QFileDialog>
 #include <Qt>
 #include <QFont>
@@ -12,32 +10,25 @@
 
 #pragma region Constructor
 
-Editor::Editor(QWidget *parent) : QTextEdit(parent) {
-    setFocusPolicy(Qt::ClickFocus);
-    setWindowFlags(Qt::Window);
-    setAcceptDrops(true);
-    setWindowTitle(tr("2Write"));
+TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
     setStyleSheet(QString("background-color: %1").arg(qApp->palette().color(QPalette::Base).name()));
-    setViewportMargins(12, 12, 12, 12);
-    
+
     setFont(QFont("Hack", 10));
     setLineWrapMode(QTextEdit::NoWrap);
-    setPlainText(QSettings("Brian Bohn II", "2write").value("text", "").toString());
     moveCursor(QTextCursor::End);
 
-    connect(new QShortcut(QKeySequence(QKeySequence::Open), this), &QShortcut::activated, this, &Editor::importFile );
-    connect(new QShortcut(QKeySequence(QKeySequence::Save), this), &QShortcut::activated, this, &Editor::saveFile );
-    connect(new QShortcut(QKeySequence(QKeySequence::SaveAs), this), &QShortcut::activated, this, &Editor::saveFileAs );
-    connect(new QShortcut(QKeySequence(QKeySequence::Find), this), &QShortcut::activated, this, &Editor::findText );
-    connect(new QShortcut(QKeySequence(QKeySequence::ZoomIn), this), &QShortcut::activated, this, [this]() { this->zoomIn(1); });
-    connect(new QShortcut(QKeySequence(QKeySequence::ZoomOut), this), &QShortcut::activated, this, [this]() { this->zoomOut(1); });
-    connect(this, &QTextEdit::selectionChanged, this, &Editor::highlightExtraSelection );
+    QSettings settings = QSettings("2write");
+
+    setPlainText(settings.value("text", "").toString());
+    filePath = settings.value("filePath", "/home").toString();
+
+    connect(this, &QTextEdit::selectionChanged, this, &TextEdit::highlightExtraSelection );
 }
 
 #pragma endregion Constructor
 #pragma region Public Functions
 
-void Editor::loadFile(const QString &path){
+void TextEdit::loadFile(const QString &path){
     if (path.isEmpty())
         return;
 
@@ -51,19 +42,23 @@ void Editor::loadFile(const QString &path){
 
     moveCursor(QTextCursor::End);
     
-    file_path = path;
+    filePath = path;
     file.close();
+}
+
+QString TextEdit::getFilePath() const {
+    return filePath;
 }
 
 #pragma endregion Public Functions
 #pragma region Qt Events
 
-void Editor::dragEnterEvent(QDragEnterEvent *event) {
+void TextEdit::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
 
-void Editor::dropEvent(QDropEvent *event) {
+void TextEdit::dropEvent(QDropEvent *event) {
     const QList<QUrl> urls = event->mimeData()->urls();
     if(urls.isEmpty())
         return;
@@ -71,16 +66,10 @@ void Editor::dropEvent(QDropEvent *event) {
     loadFile(urls.first().toLocalFile());
 }
 
-void Editor::closeEvent(QCloseEvent *event){
-    QSettings("Brian Bohn II", "2write").setValue("text", toPlainText());
-
-    event->accept();
-}
-
 #pragma endregion Qt Events
-#pragma region Private Slots
+#pragma region Public Slots
 
-void Editor::findText(){
+void TextEdit::findText(){
     QString selected = textCursor().selectedText();
     if (selected.isEmpty())
         return;
@@ -92,17 +81,17 @@ void Editor::findText(){
     find(selected);
 }
 
-void Editor::importFile(){
-    loadFile(QFileDialog::getOpenFileName(this, tr("Open Text File"), "/home", tr("Text Files (*.txt);;All Files (*)")));
+void TextEdit::importFile(){
+    loadFile(QFileDialog::getOpenFileName(this, tr("Open Text File"), filePath, tr("Text Files (*.txt);;All Files (*)")));
 }
 
-void Editor::saveFile(){
-    if (file_path.isEmpty()){
+void TextEdit::saveFile(){
+    if (filePath.isEmpty()){
         saveFileAs();
         return;
     }
 
-    QFile file(file_path);
+    QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
 
@@ -110,8 +99,8 @@ void Editor::saveFile(){
     file.close();
 }
 
-void Editor::saveFileAs(){
-    const QString path = QFileDialog::getSaveFileName(this, tr("Save Text File"));
+void TextEdit::saveFileAs(){
+    const QString path = QFileDialog::getSaveFileName(this, tr("Save Text File"), filePath);
 
     if (path.isEmpty())
         return;
@@ -121,11 +110,24 @@ void Editor::saveFileAs(){
         return;
 
     QTextStream(&file) << toPlainText();
-    file_path = path;
+    filePath = path;
     file.close();
 }
 
-void Editor::highlightExtraSelection() {
+void TextEdit::zoomIn(){
+    QTextEdit::zoomIn(1);
+    zoom += 1;
+}
+
+void TextEdit::zoomOut(){
+    QTextEdit::zoomOut(1);
+    zoom -= 1;
+}
+
+#pragma endregion Public Slots
+#pragma region Private Slots
+
+void TextEdit::highlightExtraSelection() {
     const QString current_selection = textCursor().selectedText();
     if (current_selection.isEmpty()){
         setExtraSelections({});

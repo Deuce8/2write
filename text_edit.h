@@ -1,35 +1,39 @@
-#ifndef EDITOR_H
-#define EDITOR_H
+#ifndef TEXT_EDIT_H
+#define TEXT_EDIT_H
 
 #include <QTextEdit>
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include <QCloseEvent>
 #include <QString>
 
-class Editor : public QTextEdit {
+class TextEdit : public QTextEdit {
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent = nullptr);
+    TextEdit(QWidget *parent = nullptr);
 
     void loadFile(const QString &path);
 
-private slots:
+    QString getFilePath() const;
+
+public slots:
     void findText();
     void importFile();
     void saveFile();
     void saveFileAs();
+    void zoomIn();
+    void zoomOut();
 
+private slots:
     void highlightExtraSelection();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
 
 private:
-    QString file_path;
+    int zoom;
+    QString filePath;
 };
 
 #endif
