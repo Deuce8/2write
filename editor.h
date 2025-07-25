@@ -3,6 +3,8 @@
 
 #include <QTextEdit>
 #include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QCloseEvent>
 #include <QString>
 
 class Editor : public QTextEdit {
@@ -11,18 +13,20 @@ class Editor : public QTextEdit {
 public:
     Editor(QWidget *parent = nullptr);
 
-    QString getLoadFile();
-    QString getSaveFile();
-    bool loadFile(const QString &path);
-    bool saveFile();
-    bool saveFileAs(const QString &path);
-    bool findText();
+    void loadFile(const QString &path);
+
+private slots:
+    void findText();
+    void importFile();
+    void saveFile();
+    void saveFileAs();
 
     void highlightExtraSelection();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     QString file_path;
