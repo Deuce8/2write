@@ -13,10 +13,10 @@ add_executable(2write main.cpp main_window.cpp text_edit.cpp)
 target_link_libraries(2write PRIVATE Qt6::Widgets Qt6::Gui)
 
 install(TARGETS 2write
-    RUNTIME DESTINATION $ENV{HOME}/.local/bin
+    RUNTIME DESTINATION /usr/local/bin
 )
 
-install(CODE "file(WRITE \"\$ENV{HOME}/.local/share/applications/2write.desktop\" [[
+install(CODE "file(WRITE \"/usr/local/share/applications/2write.desktop\" [[
 [Desktop Entry]
 Name=2write
 Exec=2write %F

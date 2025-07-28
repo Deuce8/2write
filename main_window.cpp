@@ -42,16 +42,21 @@ MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(pa
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event){
-    QSettings settings("2write");
+#pragma endregion Constructor
+#pragma region Protected
 
-    const QString plainText = textEdit->toPlainText();
-    const QString filePath = plainText.isEmpty() ? "" : textEdit->getFilePath();
+void MainWindow::closeEvent(QCloseEvent *event){
+    QSettings settings("Deuce8", "2write");
+
+    const bool save = settings.value("saveSession", true).toBool();
+    const QString plainText = !save ? "" : textEdit->toPlainText();
+    const QString filePath = plainText.isEmpty() || !save ? "" : textEdit->getFilePath();
 
     settings.setValue("text", plainText);
     settings.setValue("filePath", filePath);
+    settings.setValue("saveSession", save);
 
     event->accept();
 }
 
-#pragma endregion Constructor
+#pragma endregion Protected

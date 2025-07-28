@@ -2,27 +2,22 @@
 
 #include <QFile>
 #include <QMimeData>
-#include <QPalette>
 #include <QFileDialog>
-#include <Qt>
-#include <QFont>
 #include <QSettings>
 
 #pragma region Constructor
 
 TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
-    setStyleSheet(QString("background-color: %1").arg(qApp->palette().color(QPalette::Base).name()));
-
     setFont(QFont("Hack", 10));
     setLineWrapMode(QTextEdit::NoWrap);
     moveCursor(QTextCursor::End);
 
-    QSettings settings = QSettings("2write");
+    QSettings settings("Deuce8", "2write");
 
     setPlainText(settings.value("text", "").toString());
     filePath = settings.value("filePath", "/home").toString();
 
-    connect(this, &QTextEdit::selectionChanged, this, &TextEdit::highlightExtraSelection );
+    connect(this, &QTextEdit::selectionChanged, this, &TextEdit::highlightExtraSelection);
 }
 
 #pragma endregion Constructor
@@ -51,7 +46,7 @@ QString TextEdit::getFilePath() const {
 }
 
 #pragma endregion Public Functions
-#pragma region Qt Events
+#pragma region Protected
 
 void TextEdit::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasUrls())
@@ -66,7 +61,7 @@ void TextEdit::dropEvent(QDropEvent *event) {
     loadFile(urls.first().toLocalFile());
 }
 
-#pragma endregion Qt Events
+#pragma endregion Protected
 #pragma region Public Slots
 
 void TextEdit::findText(){
