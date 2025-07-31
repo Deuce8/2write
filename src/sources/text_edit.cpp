@@ -11,7 +11,7 @@ TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
     setFont(QFont("Hack", 10));
     setLineWrapMode(QTextEdit::NoWrap);
     moveCursor(QTextCursor::End);
-
+    
     QSettings settings("Deuce8", "2write");
 
     setPlainText(settings.value("text", "").toString());

@@ -14,20 +14,25 @@ MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(pa
     setWindowFlags(Qt::Window);
     setAcceptDrops(true);
     setWindowTitle(tr("2Write"));
-    setStyleSheet(QString("background-color: %1").arg(qApp->palette().color(QPalette::Base).name()));
-
+    
     //Window contents setup
     QWidget *centralWidget = new QWidget(this);
     QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
     centralLayout->setContentsMargins(12, 12, 12, 12);
 
     textEdit = new TextEdit(centralWidget);
+
+    findToolbar = new FindToolbar(centralWidget);
+    findToolbar->hide();
+
     centralLayout->addWidget(textEdit);
+    centralLayout->addWidget(findToolbar);
 
     setCentralWidget(centralWidget);
 
     //Shortcut binding
-    connect( new QShortcut(QKeySequence::Find, this), &QShortcut::activated, textEdit, &TextEdit::findText );
+    connect( new QShortcut(QKeySequence::Find, this), &QShortcut::activated, this, [this] {findToolbar->setVisible(!findToolbar->isVisible()); });
+    
     connect( new QShortcut(QKeySequence::Open, this), &QShortcut::activated, textEdit, &TextEdit::importFile );
     connect( new QShortcut(QKeySequence::Save, this), &QShortcut::activated, textEdit, &TextEdit::saveFile );
     connect( new QShortcut(QKeySequence::SaveAs, this), &QShortcut::activated, textEdit, &TextEdit::saveFileAs );

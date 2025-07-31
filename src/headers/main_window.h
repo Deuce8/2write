@@ -5,6 +5,7 @@
 #include <QCloseEvent>
 
 #include "text_edit.h"
+#include "find_toolbar.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -17,6 +18,7 @@ protected:
 
 private:
     TextEdit *textEdit;
+    FindToolbar *findToolbar;
 };
 
 #endif
