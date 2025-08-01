@@ -3,11 +3,13 @@
 
 #include <QToolBar>
 
+#include "text_edit.h"
+
 class FindToolbar : public QToolBar {
     Q_OBJECT
 
 public:
-    FindToolbar(QWidget *parent = nullptr, int argc = 1, char *argv[] = nullptr);
+    FindToolbar(QWidget *parent = nullptr, TextEdit *textEdit = nullptr);
 
 };
 

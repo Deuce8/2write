@@ -16,12 +16,15 @@ public:
     QString getFilePath() const;
 
 public slots:
-    void findText();
+    void findNext();
+    void findPrev();
+
     void importFile();
     void saveFile();
     void saveFileAs();
     void zoomIn();
     void zoomOut();
+    void setFind(const QString &find);
 
 private slots:
     void highlightExtraSelection();
@@ -32,6 +35,7 @@ protected:
 
 private:
     int zoom;
+    QString toFind;
     QString filePath;
 };
 

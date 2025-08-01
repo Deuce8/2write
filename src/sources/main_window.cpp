@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(pa
 
     textEdit = new TextEdit(centralWidget);
 
-    findToolbar = new FindToolbar(centralWidget);
+    findToolbar = new FindToolbar(centralWidget, textEdit);
     findToolbar->hide();
 
     centralLayout->addWidget(textEdit);

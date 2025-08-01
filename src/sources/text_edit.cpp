@@ -64,16 +64,30 @@ void TextEdit::dropEvent(QDropEvent *event) {
 #pragma endregion Protected
 #pragma region Public Slots
 
-void TextEdit::findText(){
-    QString selected = textCursor().selectedText();
-    if (selected.isEmpty())
+void TextEdit::findNext(){
+    if (toFind.isEmpty())
         return;
 
-    if (!find(selected))
+    if (find(toFind))
         return;
 
     moveCursor(QTextCursor::Start);
-    find(selected);
+    find(toFind);
+}
+
+void TextEdit::findPrev(){
+    if (toFind.isEmpty())
+        return;
+
+    if (find(toFind, QTextDocument::FindBackward))
+        return;
+
+    moveCursor(QTextCursor::End);
+    find(toFind, QTextDocument::FindBackward);
+}
+
+void TextEdit::setFind(const QString &find){
+    toFind = find;
 }
 
 void TextEdit::importFile(){
