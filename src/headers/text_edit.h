@@ -17,10 +17,11 @@ public slots:
 
     void saveFile();
     void saveFileAs();
+    
     void zoomIn();
     void zoomOut();
-    void setFind(const QString &find);
 
+    void setFind(const QString &find) { toFind = find; };
     void loadFile(const QString &path);
 
 private slots:

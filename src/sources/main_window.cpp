@@ -10,6 +10,7 @@
 
 #pragma region Constructor
 
+// Called when the main window is created
 MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(parent) {
     //Window setup
     setFocusPolicy(Qt::ClickFocus);
@@ -54,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(pa
 #pragma endregion Constructor
 #pragma region Private Slots
 
+// Import a file using a dialog, and emit the fileLoaded signal
 void MainWindow::importFile(){
     emit fileLoaded(QFileDialog::getOpenFileName(this, tr("Open Text File"), textEdit->getFilePath(), tr("Text Files (*.txt);;All Files (*)")));
 }
@@ -61,6 +63,7 @@ void MainWindow::importFile(){
 #pragma endregion Private Slots
 #pragma region Protected
 
+// Called when the window is closed
 void MainWindow::closeEvent(QCloseEvent *event){
     QSettings settings("Deuce8", "2write");
 
@@ -75,11 +78,13 @@ void MainWindow::closeEvent(QCloseEvent *event){
     event->accept();
 }
 
+// Called when a file is dragged into the window
 void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
 
+// Called when a file is dropped into the window
 void MainWindow::dropEvent(QDropEvent *event) {
     const QList<QUrl> urls = event->mimeData()->urls();
     if(urls.isEmpty())

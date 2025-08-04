@@ -4,6 +4,7 @@
 #include <QToolBar>
 #include <QShowEvent>
 #include <QLineEdit>
+#include <QAction>
 
 #include "text_edit.h"
 
@@ -18,7 +19,8 @@ protected:
 
 private:
     QLineEdit *lineEdit;
-
+    QAction *prevSelection;
+    QAction *nextSelection;
 };
 
 #endif

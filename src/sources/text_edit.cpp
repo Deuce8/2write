@@ -6,6 +6,7 @@
 
 #pragma region Constructor
 
+// Called when the text edit is created
 TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
     setFont(QFont("Hack", 10));
     setLineWrapMode(QTextEdit::NoWrap);
@@ -22,6 +23,7 @@ TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
 #pragma endregion Constructor
 #pragma region Public Slots
 
+// Find the next occurrence of 'toFind'
 void TextEdit::findNext(){
     if (toFind.isEmpty())
         return;
@@ -33,6 +35,7 @@ void TextEdit::findNext(){
     find(toFind);
 }
 
+// Find the previous occurrence of 'toFind'
 void TextEdit::findPrev(){
     if (toFind.isEmpty())
         return;
@@ -42,10 +45,6 @@ void TextEdit::findPrev(){
 
     moveCursor(QTextCursor::End);
     find(toFind, QTextDocument::FindBackward);
-}
-
-void TextEdit::setFind(const QString &find){
-    toFind = find;
 }
 
 // Save the current file
@@ -111,21 +110,27 @@ void TextEdit::loadFile(const QString &path){
 #pragma endregion Public Slots
 #pragma region Private Slots
 
+// Highlight all items matching the current selection, called when the selection changes
 void TextEdit::highlightExtraSelection() {
+
+    // Return if the selection is empty
     const QString current_selection = textCursor().selectedText();
     if (current_selection.isEmpty()){
         setExtraSelections({});
         return;
     }
 
+    // Get the cursor, and set it to the start of the document
     QTextDocument *doc = document();
     QTextCursor cursor(doc);
     cursor.movePosition(QTextCursor::Start);
 
+    // Create a format for the highlighted text
     QTextCharFormat format;
     format.setBackground(palette().highlight().color().lighter(64));
     format.setForeground(palette().highlightedText().color());
 
+    // Create and populate a list of extra selections with all occurrences of the current selection
     QList<QTextEdit::ExtraSelection> selections;
 
     while (true) {
@@ -137,6 +142,7 @@ void TextEdit::highlightExtraSelection() {
         cursor.setPosition(cursor.selectionEnd());
     }
 
+    // Set the extra selections to the text edit
     setExtraSelections(selections);
 }
 
