@@ -2,9 +2,11 @@
 
 #include <QVBoxLayout>
 #include <QShortcut>
+#include <QMimeData>
 #include <QKeySequence>
 #include <QFileInfo>
 #include <QSettings>
+#include <QFileDialog>
 
 #pragma region Constructor
 
@@ -30,24 +32,33 @@ MainWindow::MainWindow(QWidget *parent, int argc, char *argv[]) : QMainWindow(pa
 
     setCentralWidget(centralWidget);
 
-    //Shortcut binding
+    //Signal & Slot binding
     connect( new QShortcut(QKeySequence::Find, this), &QShortcut::activated, this, [this] {findToolbar->setVisible(!findToolbar->isVisible()); });
     
-    connect( new QShortcut(QKeySequence::Open, this), &QShortcut::activated, textEdit, &TextEdit::importFile );
+    connect( new QShortcut(QKeySequence::Open, this), &QShortcut::activated, this, &MainWindow::importFile );
     connect( new QShortcut(QKeySequence::Save, this), &QShortcut::activated, textEdit, &TextEdit::saveFile );
     connect( new QShortcut(QKeySequence::SaveAs, this), &QShortcut::activated, textEdit, &TextEdit::saveFileAs );
     connect( new QShortcut(QKeySequence::ZoomIn, this), &QShortcut::activated, textEdit, &TextEdit::zoomIn );
     connect( new QShortcut(QKeySequence::ZoomOut, this), &QShortcut::activated, textEdit, &TextEdit::zoomOut );
 
+    connect( this, &MainWindow::fileLoaded, textEdit, &TextEdit::loadFile);
+
     //Argument parsing, and loading provided files
     if (argc > 1) {
         QString filePath = QString::fromLocal8Bit(argv[1]);
         if (QFileInfo::exists(filePath))
-            textEdit->loadFile(filePath);
+            emit fileLoaded(filePath);
     }
 }
 
 #pragma endregion Constructor
+#pragma region Private Slots
+
+void MainWindow::importFile(){
+    emit fileLoaded(QFileDialog::getOpenFileName(this, tr("Open Text File"), textEdit->getFilePath(), tr("Text Files (*.txt);;All Files (*)")));
+}
+
+#pragma endregion Private Slots
 #pragma region Protected
 
 void MainWindow::closeEvent(QCloseEvent *event){
@@ -62,6 +73,19 @@ void MainWindow::closeEvent(QCloseEvent *event){
     settings.setValue("saveSession", save);
 
     event->accept();
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent *event) {
+    const QList<QUrl> urls = event->mimeData()->urls();
+    if(urls.isEmpty())
+        return;
+    
+    emit fileLoaded(urls.first().toLocalFile());
 }
 
 #pragma endregion Protected

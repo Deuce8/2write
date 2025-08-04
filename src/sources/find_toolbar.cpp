@@ -4,7 +4,6 @@
 #include <QShortcut>
 #include <QKeySequence>
 #include <QAction>
-#include <QLineEdit>
 
 #pragma region Constructor
 
@@ -15,7 +14,7 @@ FindToolbar::FindToolbar(QWidget *parent, TextEdit *textEdit) : QToolBar(parent)
     setStyleSheet("QToolBar{spacing:0px;}");
 
     //Content Setup
-    QLineEdit *lineEdit = new QLineEdit(this);
+    lineEdit = new QLineEdit(this);
     lineEdit->setFont(QFont("Hack", 10));
     lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     lineEdit->setPlaceholderText("Find");
@@ -41,3 +40,10 @@ FindToolbar::FindToolbar(QWidget *parent, TextEdit *textEdit) : QToolBar(parent)
 }
 
 #pragma endregion Constructor
+#pragma region Protected
+
+void FindToolbar::showEvent(QShowEvent *event) {
+    lineEdit->setFocus();
+}
+
+#pragma endregion Protected

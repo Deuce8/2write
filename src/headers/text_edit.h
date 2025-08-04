@@ -2,8 +2,6 @@
 #define TEXT_EDIT_H
 
 #include <QTextEdit>
-#include <QDragEnterEvent>
-#include <QDropEvent>
 
 class TextEdit : public QTextEdit {
     Q_OBJECT
@@ -11,27 +9,22 @@ class TextEdit : public QTextEdit {
 public:
     TextEdit(QWidget *parent = nullptr);
 
-    void loadFile(const QString &path);
-
-    QString getFilePath() const;
+    QString getFilePath() const { return filePath; };
 
 public slots:
     void findNext();
     void findPrev();
 
-    void importFile();
     void saveFile();
     void saveFileAs();
     void zoomIn();
     void zoomOut();
     void setFind(const QString &find);
 
+    void loadFile(const QString &path);
+
 private slots:
     void highlightExtraSelection();
-
-protected:
-    void dragEnterEvent(QDragEnterEvent *event) override;
-    void dropEvent(QDropEvent *event) override;
 
 private:
     int zoom;

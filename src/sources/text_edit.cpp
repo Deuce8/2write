@@ -1,7 +1,6 @@
 #include "text_edit.h"
 
 #include <QFile>
-#include <QMimeData>
 #include <QFileDialog>
 #include <QSettings>
 
@@ -21,47 +20,6 @@ TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) {
 }
 
 #pragma endregion Constructor
-#pragma region Public Functions
-
-void TextEdit::loadFile(const QString &path){
-    if (path.isEmpty())
-        return;
-
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextDocument* doc = new QTextDocument(this);
-    doc->setPlainText(QTextStream(&file).readAll());
-    setDocument(doc);
-
-    moveCursor(QTextCursor::End);
-    
-    filePath = path;
-    file.close();
-}
-
-QString TextEdit::getFilePath() const {
-    return filePath;
-}
-
-#pragma endregion Public Functions
-#pragma region Protected
-
-void TextEdit::dragEnterEvent(QDragEnterEvent *event) {
-    if (event->mimeData()->hasUrls())
-        event->acceptProposedAction();
-}
-
-void TextEdit::dropEvent(QDropEvent *event) {
-    const QList<QUrl> urls = event->mimeData()->urls();
-    if(urls.isEmpty())
-        return;
-    
-    loadFile(urls.first().toLocalFile());
-}
-
-#pragma endregion Protected
 #pragma region Public Slots
 
 void TextEdit::findNext(){
@@ -90,10 +48,7 @@ void TextEdit::setFind(const QString &find){
     toFind = find;
 }
 
-void TextEdit::importFile(){
-    loadFile(QFileDialog::getOpenFileName(this, tr("Open Text File"), filePath, tr("Text Files (*.txt);;All Files (*)")));
-}
-
+// Save the current file
 void TextEdit::saveFile(){
     if (filePath.isEmpty()){
         saveFileAs();
@@ -108,6 +63,7 @@ void TextEdit::saveFile(){
     file.close();
 }
 
+// Save the file with a dialog
 void TextEdit::saveFileAs(){
     const QString path = QFileDialog::getSaveFileName(this, tr("Save Text File"), filePath);
 
@@ -123,14 +79,33 @@ void TextEdit::saveFileAs(){
     file.close();
 }
 
+// Zoom in by 1 step    (This is a workaround for the fact that QTextEdit::zoomIn() requires a parameter, and we want to use it without parameters.)
 void TextEdit::zoomIn(){
     QTextEdit::zoomIn(1);
     zoom += 1;
 }
 
+// Zoom out by 1 step   (This is a workaround for the fact that QTextEdit::zoomOut() requires a parameter, and we want to use it without parameters.)
 void TextEdit::zoomOut(){
     QTextEdit::zoomOut(1);
     zoom -= 1;
+}
+
+// Load a file into the text edit
+void TextEdit::loadFile(const QString &path){
+    if (path.isEmpty())
+        return;
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextDocument* doc = new QTextDocument(this);
+    doc->setPlainText(QTextStream(&file).readAll());
+    setDocument(doc);
+
+    moveCursor(QTextCursor::End);
+    filePath = path;
 }
 
 #pragma endregion Public Slots
@@ -148,8 +123,8 @@ void TextEdit::highlightExtraSelection() {
     cursor.movePosition(QTextCursor::Start);
 
     QTextCharFormat format;
-    format.setBackground(qApp->palette().highlight().color().lighter(64));
-    format.setForeground(qApp->palette().highlightedText().color());
+    format.setBackground(palette().highlight().color().lighter(64));
+    format.setForeground(palette().highlightedText().color());
 
     QList<QTextEdit::ExtraSelection> selections;
 
